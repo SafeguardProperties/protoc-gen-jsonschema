@@ -277,14 +277,11 @@ func (c *Converter) convertField(curPkg *ProtoPackage, desc *descriptor.FieldDes
 			}
 		}
 
-		if len(jsonSchemaType.Enum) > 0 {
-			jsonSchemaType.Items.Enum = jsonSchemaType.Enum
-			jsonSchemaType.Enum = nil
-			jsonSchemaType.Items.OneOf = nil
-		} else {
-			jsonSchemaType.Items.Type = jsonSchemaType.Type
-			jsonSchemaType.Items.OneOf = jsonSchemaType.OneOf
-		}
+		jsonSchemaType.Items.Enum = jsonSchemaType.Enum
+		jsonSchemaType.Enum = nil
+		jsonSchemaType.Items.OneOf = jsonSchemaType.OneOf
+		jsonSchemaType.OneOf = nil
+		jsonSchemaType.Items.Type = jsonSchemaType.Type
 
 		if messageFlags.AllowNullValues {
 			jsonSchemaType.OneOf = []*jsonschema.Type{
