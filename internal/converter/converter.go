@@ -166,6 +166,11 @@ func (c *Converter) convertEnumType(enum *descriptor.EnumDescriptorProto, conver
 					converterFlags.EnumsTrimPrefix = true
 				}
 
+				// ENUM w/ uniqueItems flag
+				if enumOptions.UniqueItems {
+					jsonSchemaType.UniqueItems = true
+				}
+
 				// If this particular ENUM is marked with the "ignore" option then return a skipped error:
 				if enumOptions.GetIgnore() {
 					c.logger.WithField("msg_name", enum.GetName()).Debug("Skipping ignored enum")
@@ -221,9 +226,25 @@ func (c *Converter) convertEnumType(enum *descriptor.EnumDescriptorProto, conver
 		// If we're using constants for ENUMs then add these here, along with their title:
 		if converterFlags.EnumsAsConstants {
 			c.schemaVersion = versionDraft06 // Const requires draft-06
-			jsonSchemaType.OneOf = append(jsonSchemaType.OneOf, &jsonschema.Type{Extras: map[string]interface{}{"const": valueName}, Description: valueDescription})
+
+			// Override default Title and Description if desired
+			var valueTitle string
+			if opts := value.GetOptions(); opts != nil && proto.HasExtension(opts, protoc_gen_jsonschema.E_EnumValueOptions) {
+				if opt := proto.GetExtension(opts, protoc_gen_jsonschema.E_EnumValueOptions); opt != nil {
+					if enumValueOptions, ok := opt.(*protoc_gen_jsonschema.EnumValueOptions); ok {
+						if len(enumValueOptions.Title) > 0 {
+							valueTitle = enumValueOptions.Title
+						}
+						if len(enumValueOptions.Description) > 0 {
+							valueDescription = enumValueOptions.Description
+						}
+					}
+				}
+			}
+
+			jsonSchemaType.OneOf = append(jsonSchemaType.OneOf, &jsonschema.Type{Extras: map[string]interface{}{"const": valueName}, Description: valueDescription, Title: valueTitle})
 			if !converterFlags.EnumsAsStringsOnly {
-				jsonSchemaType.OneOf = append(jsonSchemaType.OneOf, &jsonschema.Type{Extras: map[string]interface{}{"const": value.GetNumber()}, Description: valueDescription})
+				jsonSchemaType.OneOf = append(jsonSchemaType.OneOf, &jsonschema.Type{Extras: map[string]interface{}{"const": value.GetNumber()}, Description: valueDescription, Title: valueTitle})
 			}
 		}
 

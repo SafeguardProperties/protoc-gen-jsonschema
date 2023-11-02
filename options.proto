@@ -67,12 +67,25 @@ message EnumOptions {
 
   // Enums tagged with this will only provide string values as options (not their numerical equivalents):
   bool enums_as_strings_only = 2;
-  
+
   // Enums tagged with this will have enum name prefix removed from values:
   bool enums_trim_prefix = 3;
 
   // Enums tagged with this will not be processed
   bool ignore = 4;
+
+  // Enums tagged with this will present unique items as true
+  bool unique_items = 5;
+}
+
+// Custom EnumValueOptions
+message EnumValueOptions {
+
+  // Override the default title for enum value
+  string title = 1;
+
+  // Override the default description for enum value
+  string description = 2;
 }
 
 
@@ -90,4 +103,8 @@ extend google.protobuf.MessageOptions {
 
 extend google.protobuf.EnumOptions {
   EnumOptions enum_options = 1128;
+}
+
+extend google.protobuf.EnumValueOptions {
+  EnumValueOptions enum_value_options = 1129;
 }
