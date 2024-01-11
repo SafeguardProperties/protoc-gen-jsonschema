@@ -388,6 +388,10 @@ func (c *Converter) convertField(curPkg *ProtoPackage, desc *descriptor.FieldDes
 
 	jsonSchemaType.Required = dedupe(jsonSchemaType.Required)
 
+	if len(jsonSchemaType.OneOf) > 0 {
+		jsonSchemaType.Type = "string"
+	}
+
 	return jsonSchemaType, nil
 }
 
