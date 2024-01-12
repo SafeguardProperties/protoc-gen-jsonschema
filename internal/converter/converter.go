@@ -255,6 +255,8 @@ func (c *Converter) convertEnumType(enum *descriptor.EnumDescriptorProto, conver
 		}
 	}
 
+	jsonSchemaType.Type = "string"
+
 	return jsonSchemaType, nil
 }
 
